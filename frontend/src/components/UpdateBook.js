@@ -1,4 +1,4 @@
-import React, {useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -14,11 +14,10 @@ const UpdateBook = () => {
     genre_id: '',
   });
 
-  const [user, setUser] = useState([]);
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const token = localStorage.getItem('accessToken');
+  const bookId = localStorage.getItem('accessBookId');
 
   // Function to handle form field changes
   const handleInputChange = (event) => {
@@ -29,22 +28,31 @@ const UpdateBook = () => {
     });
   };
 
-  const getUser = () => {
-    axios
-      .get((`http://localhost:5000/allBooks${formData.id}`))
-      .then((item) => {
-        setUser(item.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   useEffect(() => {
-    getUser();
-  }, []);
+    const fetchBookData = async () => {
+      const response = await axios.get(`http://localhost:5000/getBook/${bookId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const editWithBookId = localStorage.getItem('accessBookId');
+      setFormData({
+        id: response.data.id,
+        title: response.data.title,
+        description: response.data.description,
+        published_year: response.data.published_year,
+        quantity_available: response.data.quantity_available,
+        author_id: response.data.author_id,
+        genre_id: response.data.genre_id,
+      });
+    };
+
+    if (bookId) {
+      fetchBookData();
+    }
+  }, [token, bookId]);
+
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -93,8 +101,9 @@ const UpdateBook = () => {
                 className="form-control"
                 id="id"
                 name="id"
-                value={user.id}
+                value={formData.id}
                 onChange={handleInputChange}
+                disabled
               />
             </div>
             <div className="mb-3">
@@ -104,7 +113,7 @@ const UpdateBook = () => {
                 className="form-control"
                 id="title"
                 name="title"
-                value={user.title}
+                value={formData.title}
                 onChange={handleInputChange}
               />
             </div>
@@ -114,7 +123,7 @@ const UpdateBook = () => {
                 className="form-control"
                 id="description"
                 name="description"
-                value={user.description}
+                value={formData.description}
                 onChange={handleInputChange}
               />
             </div>
@@ -125,7 +134,7 @@ const UpdateBook = () => {
                 className="form-control"
                 id="publishedYear"
                 name="published_year"
-                value={user.published_year}
+                value={formData.published_year}
                 onChange={handleInputChange}
               />
             </div>
@@ -136,7 +145,7 @@ const UpdateBook = () => {
                 className="form-control"
                 id="quantityAvailable"
                 name="quantity_available"
-                value={user.quantity_available}
+                value={formData.quantity_available}
                 onChange={handleInputChange}
               />
             </div>
@@ -147,7 +156,7 @@ const UpdateBook = () => {
                 className="form-control"
                 id="authorId"
                 name="author_id"
-                value={user.author_id}
+                value={formData.author_id}
                 onChange={handleInputChange}
               />
             </div>
@@ -158,7 +167,7 @@ const UpdateBook = () => {
                 className="form-control"
                 id="genreId"
                 name="genre_id"
-                value={user.genre_id}
+                value={formData.genre_id}
                 onChange={handleInputChange}
               />
             </div>
