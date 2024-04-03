@@ -1,9 +1,10 @@
 const { verifyToken } = require('../middleware/auth');
 const db = require('../config/db')
+const fs = require('fs');
+const path = require('path');
 
 const getAllBooks = async (req, res) => {
     try {
-        // const data = await db.query('SELECT book.*, author.author_name FROM book JOIN author ON book.author_id = author.author_id')
         const data = await db.query('SELECT * FROM book')
         if (!data) {
             return res.status(404).send({
@@ -115,7 +116,75 @@ const deleteBook = async (req, res) => {
   };
 
 
+  const getBookById = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const result = await db.query(`SELECT * FROM book WHERE book_id = ?`, [id]);
 
+        if (result.length === 0) {
+            return res.status(404).send({
+                message: 'No records found'
+            });
+        }
+
+        const data = result[0]; // the first element
+
+        res.status(200).send({
+            message: "Data fetched!",
+            data: data
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: 'Error in get books by id API!',
+            error: error.message // Sending error message for better understanding
+        });
+    }
+}
+
+
+const uploadFileBook = async (req, res) => {
+    try {
+        console.log(req.files)
+        let id = req.params.id  
+        let images = req.files.image //key and auth
+
+        if(images.length >= 1){
+            const dirExists = fs.existsSync(`public/assets/book/${id}`);
+            if (!dirExists) {
+                fs.mkdirSync(`public/assets/book/${id}`, { recursive: true });
+            }
+
+            if (images == undefined || images == null) throw new Error("file not found!");
+
+            const promises = images.map(image => {
+                let savePath = [`/public/assets/book/${id}/${Date.now()}.${image.name.split(".").pop()}`]
+
+                return new Promise((resolve, reject) => {
+                    image.mv(path.join(__dirname, ".." + savePath), async (err) => {
+                        if (err) return reject(err);
+
+                        const updateQuery = 'UPDATE book SET image = ? WHERE book_id = ?'
+                        await db.query(updateQuery, [[savePath], id]);
+                        resolve([savePath]);
+                    });
+                });
+            });
+
+            await Promise.all(promises);
+            res.status(201).send({
+                message: 'files uploaded!'
+            });
+        }
+        else {
+            throw new Error("at least one file is required!");
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'error in file upload api!' });
+    }
+}
 
 
   
@@ -153,4 +222,4 @@ const deleteBook = async (req, res) => {
 //   please remove any error are there and please provide me correct code 
 
 
-module.exports = { getAllBooks, addBook, updateBoook,deleteBook }
+module.exports = { getAllBooks, addBook, updateBoook,deleteBook,getBookById,uploadFileBook }

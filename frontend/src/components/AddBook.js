@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -16,10 +15,7 @@ const AddBook = () => {
   const navigate = useNavigate()
 
   const token = localStorage.getItem('accessToken');
- 
-  // const history = useHistory();
-
-  // Function to handle form field changes
+  
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData({
@@ -107,6 +103,3 @@ const AddBook = () => {
 
 export default AddBook;
 
-
-
-// genrate a full code for update book  using xmlhttprequest in react js

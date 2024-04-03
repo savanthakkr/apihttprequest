@@ -1,12 +1,16 @@
 const { verifyToken } = require('../middleware/auth');
 const db = require('../config/db')
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
 
 
 
 const generateToken = (user) => {
     return jwt.sign({ email: user.email, password: user.password }, 'crud', { expiresIn: '24h' });
 };
+
+
 
 const checkLogin = async (req, res) => {
     try {
@@ -40,4 +44,45 @@ const checkLogin = async (req, res) => {
 }
 
 
-module.exports = {checkLogin}
+
+const uploadFile = async (req, res) => {
+    try {
+        console.log(req.files)
+        let id = req.params.id  
+        let image = req.files.image //key and auth
+        if(image.length>1){
+            throw new error('multiple file not allowed!')
+        }
+
+        const dirExists = fs.existsSync('public/assets');
+        if (!dirExists) {
+            fs.mkdirSync('public/assets', { recursive: true });
+        }
+
+        if (image == undefined || image == null) throw new Error("file not found!");
+
+       // let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
+
+       let savePath = `/public/assets/${Date.now()}.${image.name.split(".").pop()}`
+        image.mv(path.join(__dirname, ".." + savePath), async (err) => {
+            if (err) throw new Error("error in uploading")
+
+            else {
+                const updateQuery = 'UPDATE user SET image = ? WHERE id = ?'
+                await db.query(updateQuery, [savePath, id]);
+                res.status(201).send({
+                    message: 'file uploaded!'
+                })
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'error in file upload api!' });
+    }
+}
+
+
+// i want to show the image file not found in request in this function please resolve 
+
+
+module.exports = {checkLogin,uploadFile}

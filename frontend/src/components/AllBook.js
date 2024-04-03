@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
 
@@ -21,6 +21,8 @@ const AllBook = () => {
       console.log('edit book with id ', bookID)
       localStorage.setItem('accessBookId', bookID);
   };
+
+  const {bookid} = useParams();
 
 
   const handleDelete = (bookID) => {
@@ -42,6 +44,29 @@ const AllBook = () => {
     console.log('delete book with id ', bookID);
   };
 
+  // const [image, setImage]  = useState([]);
+
+  // useEffect(() => {
+  //   const fetchBookData = async () => {
+  
+  //     try {
+  //       const response = await fetch(`http://localhost:5000/allBook/${bookId}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       });
+  //       const data = await response.json();
+  //       setImage(data.data[0]);
+  //       console.log(data)
+  //     } catch (error) {
+  //       console.error('Error fetching book data:', error);
+  //     }
+  //   };
+  //   fetchBookData();
+  // }, [bookId]);
+
+  
+
 
 
 
@@ -57,11 +82,13 @@ const AllBook = () => {
           const xhr = new XMLHttpRequest();
           xhr.open('GET', 'http://localhost:5000/allBooks', true);
           xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+          // const path = [`/public/assets/book/${bookid}`]
+          // console.log(path);
     
           xhr.onload = () => {
             if (xhr.status === 200) {
               const response = JSON.parse(xhr.responseText);
-              console.log(response.data, 'fuck react');
     
               if (Array.isArray(response.data)) {
                 console.log('l : ', response);
@@ -86,30 +113,6 @@ const AllBook = () => {
     
       fetchBooks();
     }, [token]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -138,6 +141,7 @@ const AllBook = () => {
                                 <td>{book.quantity_available}</td>
                                 <td>{book.author_id}</td>
                                 <td>{book.genre_id}</td>
+                                <td><img src={`http://localhost:5000${book?.image}`}/></td>
                                 <td><button  onClick={ () => handleUpdate(book.book_id)}>EDIT</button></td>
                                 <td><button  onClick={ () => handleDelete(book.book_id)}>DELETE</button></td>
                             </tr>

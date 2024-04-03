@@ -1,9 +1,9 @@
 const { getAllAuthors, addAuthor, updateAuthor, deleteAuthor } = require("../controller/authorController");
 
-const { getAllBooks, deleteBook, addBook, updateBoook } = require("../controller/bookController");
+const { getAllBooks,getBookById, deleteBook, addBook, updateBoook,uploadFileBook } = require("../controller/bookController");
 const express = require('express');
 const { searchBooksAndAuthors } = require("../controller/searchController");
-const { checkLogin } = require("../controller/loginController");
+const { checkLogin,uploadFile } = require("../controller/loginController");
 const { verifyToken } = require("../middleware/auth");
 
 const router = express.Router();
@@ -26,6 +26,14 @@ router.get('/allAuthors',verifyToken, getAllAuthors)
 //add author
 router.post('/addAuthor', verifyToken,addAuthor) 
 
+//upload image
+router.post('/uploadFile/:id', verifyToken,uploadFile) 
+
+
+//upload image book
+router.post('/uploadFileBook/:id', verifyToken,uploadFileBook) 
+
+
 //update author
 router.put('/updateAuthor/:id',verifyToken,updateAuthor)
 
@@ -37,5 +45,8 @@ router.delete('/deleteBook/:id',verifyToken,deleteBook)
 
 //search
 router.get('/search',verifyToken,searchBooksAndAuthors)
+
+//getBookById 
+router.get('/getBookById/:id',verifyToken,getBookById)
 
 module.exports = router;
