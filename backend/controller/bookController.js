@@ -60,6 +60,43 @@ const addBook = async (req, res) => {
     }
 }
 
+
+const register = async (req, res) => {
+    try {
+        const { name, email, number, password } = req.body
+
+        if (!name || !email || !number || !password ) {
+            return res.status(409).send({
+                message: "all fields are required!"
+            })
+        }
+
+        const [existingEmail] = await db.query(`SELECT * FROM register WHERE email = ?`, [email])
+        if (existingEmail.length > 0) {
+            return res.status(409).send({
+                message: "user already exist!"
+            })
+        }
+
+        const data = await db.query(`INSERT INTO register (name, email, number, password) VALUES (?,?,?,?)`, [ name, email, number, password])
+
+        if (!data) {
+            return res.status(404).send({
+                message: 'Error in INSERT query!'
+            })
+        }
+
+        res.status(201).send({
+            message: 'Record created!'
+        })
+    } catch (error) {
+        console.log(error)
+        res.send({
+            message: 'error in register api!'
+        })
+    }
+}
+
 const updateBoook = async (req, res) => {
     try {
 
@@ -222,4 +259,4 @@ const uploadFileBook = async (req, res) => {
 //   please remove any error are there and please provide me correct code 
 
 
-module.exports = { getAllBooks, addBook, updateBoook,deleteBook,getBookById,uploadFileBook }
+module.exports = { getAllBooks, addBook, updateBoook,deleteBook,getBookById,uploadFileBook,register }

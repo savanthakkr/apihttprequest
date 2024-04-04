@@ -1,15 +1,21 @@
 const { getAllAuthors, addAuthor, updateAuthor, deleteAuthor } = require("../controller/authorController");
 
-const { getAllBooks,getBookById, deleteBook, addBook, updateBoook,uploadFileBook } = require("../controller/bookController");
+const { getAllBooks,getBookById, deleteBook, addBook, updateBoook,uploadFileBook,register } = require("../controller/bookController");
 const express = require('express');
 const { searchBooksAndAuthors } = require("../controller/searchController");
-const { checkLogin,uploadFile } = require("../controller/loginController");
+const { checkLogin,uploadFile, login } = require("../controller/loginController");
 const { verifyToken } = require("../middleware/auth");
 
 const router = express.Router();
 
 //login
-router.post('/login',checkLogin)
+// router.post('/loginCheck',checkLogin)
+
+//login
+router.post('/login',login)
+
+//register
+router.post('/register', register)
 
 //all user
 router.get('/allBooks', verifyToken ,getAllBooks)

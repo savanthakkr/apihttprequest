@@ -5,10 +5,12 @@ import Login from '../src/components/Login';
 import AllBook from './components/AllBook';
 import AddBook from './components/AddBook';
 import UpdateBook from './components/UpdateBook';
+import Register from './components/Resgister';
 
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path='/allBooks' element={<AllBook/>}/>
       <Route path='/addBooks' element={<AddBook/>}/>

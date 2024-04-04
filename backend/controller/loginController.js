@@ -41,7 +41,46 @@ const checkLogin = async (req, res) => {
             error
         });
     }
+    
 }
+
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const [existingUser] = await db.query('SELECT * FROM register WHERE email = ? ', [email]);
+
+    
+        if (existingUser.length>0) {
+            
+            const user = existingUser[0];
+            const passwordcheck = await db.query('SELECT * FROM register WHERE password = ? ', [password]);
+        
+            if(passwordcheck){
+                const token = generateToken(existingUser);
+                res.cookie('jwt','Bearer '+ token,{maxAge:24*60*60*1000,httpOnly:true});
+            }
+
+            // Pass existingUser instead of user
+            return res.status(200).send({ 
+                message: 'Login success!',
+                token: token 
+            });
+        } else {
+            return res.status(401).send({ message: 'Incorrect email or password!' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: 'Error in login check API!',
+            error
+        });
+    }
+    
+}
+
+
+
+// when email and password are exist in database then login otherwise not plesae provde me a code 
 
 
 
@@ -85,4 +124,4 @@ const uploadFile = async (req, res) => {
 // i want to show the image file not found in request in this function please resolve 
 
 
-module.exports = {checkLogin,uploadFile}
+module.exports = {checkLogin, uploadFile, login }
