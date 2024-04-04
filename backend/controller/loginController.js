@@ -56,8 +56,8 @@ const login = async (req, res) => {
             const passwordcheck = await db.query('SELECT * FROM register WHERE password = ? ', [password]);
         
             if(passwordcheck){
-                const token = generateToken(existingUser);
-                res.cookie('jwt','Bearer '+ token,{maxAge:24*60*60*1000,httpOnly:true});
+                const token = generateToken(user);
+                return res.status(200).send({message:"login" , token: token})
             }
 
             // Pass existingUser instead of user
